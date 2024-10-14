@@ -1,0 +1,9 @@
+{
+    "type": "response.audio_transcript.delta",
+    "event_id": "event_AIK0x0aQMXkdbBN09wwL9",
+    "response_id": "resp_AIK0waE29Je5nvE0Lp7XJ",
+    "item_id": "item_AIK0wRecrZqZlLV2oUVja",
+    "output_index": 0,
+    "content_index": 0,
+    "delta": "I"
+}

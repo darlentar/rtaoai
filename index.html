@@ -1,0 +1,158 @@
+<html>
+<button type="button" id="record">Record</button>
+<button type="button" id="stop">Stop Record</button>
+<div id="transcript"></div>
+
+<script>
+	// Initialize a single shared AudioContext (create only one context for multiple function calls)
+	const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+	let globalCurrentTime = audioContext.currentTime; // Track time across multiple calls
+
+	function playPcm16Base64Audio(base64String, sampleRate = 16000, numChannels = 1) {
+		// Use globalCurrentTime to ensure that multiple function calls are scheduled properly
+		let startTime = Math.max(globalCurrentTime, audioContext.currentTime); // Ensure it's at least the current audio context time
+
+		// Decode the base64 string to an ArrayBuffer
+		const audioData = base64ToArrayBuffer(base64String);
+
+		// Convert PCM 16-bit little-endian to AudioBuffer
+		const audioBuffer = convertPcm16ToAudioBuffer(audioData, audioContext, sampleRate, numChannels);
+
+		// Schedule the audio to play after the previous one finishes
+		playAudioBuffer(audioBuffer, audioContext, startTime);
+
+		// Increment startTime for the next audio clip
+		startTime += audioBuffer.duration; // This makes sure the next clip is scheduled after the current one ends
+
+		// Update globalCurrentTime after the current array is scheduled
+		globalCurrentTime = startTime;
+	}
+
+	// Helper function to decode base64 to ArrayBuffer
+	function base64ToArrayBuffer(base64) {
+		const binaryString = atob(base64);
+		const length = binaryString.length;
+		const buffer = new ArrayBuffer(length);
+		const view = new Uint8Array(buffer);
+
+		for (let i = 0; i < length; i++) {
+			view[i] = binaryString.charCodeAt(i);
+		}
+
+		return buffer;
+	}
+
+	// Helper function to convert PCM 16-bit little-endian to AudioBuffer
+	function convertPcm16ToAudioBuffer(arrayBuffer, audioContext, sampleRate, numChannels) {
+		const dataView = new DataView(arrayBuffer);
+		const numSamples = arrayBuffer.byteLength / 2; // 16-bit audio (2 bytes per sample)
+
+		// Create an empty AudioBuffer
+		const audioBuffer = audioContext.createBuffer(numChannels, numSamples, sampleRate);
+
+		// Fill the AudioBuffer with the decoded PCM data
+		for (let channel = 0; channel < numChannels; channel++) {
+			const buffer = audioBuffer.getChannelData(channel);
+			for (let i = 0; i < numSamples; i++) {
+				buffer[i] = dataView.getInt16(i * 2, true) / 32768; // 16-bit PCM is in range [-32768, 32767]
+			}
+		}
+
+		return audioBuffer;
+	}
+
+	// Helper function to play AudioBuffer at a specified time
+	function playAudioBuffer(audioBuffer, audioContext, startTime) {
+		const source = audioContext.createBufferSource();
+		source.buffer = audioBuffer;
+		source.connect(audioContext.destination);
+		source.start(startTime); // Schedule to start at the given time
+	}
+
+
+	const socket = new WebSocket('ws://127.0.0.1:8000/ws');
+	transcript = document.getElementById("transcript")
+
+	socket.onopen = function (event) {
+	};
+
+	socket.onmessage = function (event) {
+		event = JSON.parse(event.data)
+		switch (event.type) {
+			case "event":
+				console.log(event.data)
+				break
+			case "new.client.transcript":
+				let cp = document.createElement("p")
+				cp.innerText = "Client: " + event.data
+				transcript.append(cp)
+				break
+			case "new.server.transcript":
+				let sp = document.createElement("p")
+				sp.innerText = "Server: " + event.data
+				transcript.append(sp)
+				break
+			case "new.audio":
+				playPcm16Base64Audio(event.data, 24000, 1);
+				break
+		}
+	};
+
+	socket.onclose = function (event) {
+	};
+
+	function sendMessage(message) {
+		socket.send(message);
+	}
+
+
+	if (navigator.mediaDevices) {
+		console.log("getUserMedia supported.");
+
+		record = document.getElementById("record")
+		stop = document.getElementById("stop")
+		const constraints = { audio: true };
+		let chunks = [];
+
+		navigator.mediaDevices
+			.getUserMedia(constraints)
+			.then((stream) => {
+				const mediaRecorder = new MediaRecorder(stream);
+
+				record.onclick = () => {
+					mediaRecorder.start();
+					console.log(mediaRecorder.state);
+					console.log("recorder started");
+					record.style.background = "red";
+					record.style.color = "black";
+				};
+
+				stop.onclick = () => {
+					mediaRecorder.stop();
+					console.log(mediaRecorder.state);
+					console.log("recorder stopped");
+					record.style.background = "";
+					record.style.color = "";
+				};
+
+				mediaRecorder.onstop = (e) => {
+					console.log("data available after MediaRecorder.stop() called.");
+
+					const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+					chunks = [];
+					console.log("recorder stopped");
+					sendMessage(blob)
+				};
+
+				mediaRecorder.ondataavailable = (e) => {
+					chunks.push(e.data);
+				};
+			})
+			.catch((err) => {
+				console.error(`The following error occurred: ${err}`);
+			});
+	}
+
+</script>
+
+</html>

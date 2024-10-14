@@ -1,0 +1,12 @@
+{
+    "type": "response.created",
+    "event_id": "event_AIK0wLx18UPne8Qy7yaub",
+    "response": {
+        "object": "realtime.response",
+        "id": "resp_AIK0waE29Je5nvE0Lp7XJ",
+        "status": "in_progress",
+        "status_details": null,
+        "output": [],
+        "usage": null
+    }
+}

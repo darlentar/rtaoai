@@ -1,0 +1,12 @@
+{
+    "type": "response.content_part.done",
+    "event_id": "event_AIK0yrlr8BwhhgeHtbtRI",
+    "response_id": "resp_AIK0waE29Je5nvE0Lp7XJ",
+    "item_id": "item_AIK0wRecrZqZlLV2oUVja",
+    "output_index": 0,
+    "content_index": 0,
+    "part": {
+        "type": "audio",
+        "transcript": "I can help with that. Could you please provide the order number or any details related to your order?"
+    }
+}

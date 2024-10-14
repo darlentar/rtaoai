@@ -1,0 +1,39 @@
+{
+    "type": "response.done",
+    "event_id": "event_AIK0yPp5dlimFcfDSc4p3",
+    "response": {
+        "object": "realtime.response",
+        "id": "resp_AIK0waE29Je5nvE0Lp7XJ",
+        "status": "completed",
+        "status_details": null,
+        "output": [
+            {
+                "id": "item_AIK0wRecrZqZlLV2oUVja",
+                "object": "realtime.item",
+                "type": "message",
+                "status": "completed",
+                "role": "assistant",
+                "content": [
+                    {
+                        "type": "audio",
+                        "transcript": "I can help with that. Could you please provide the order number or any details related to your order?"
+                    }
+                ]
+            }
+        ],
+        "usage": {
+            "total_tokens": 289,
+            "input_tokens": 145,
+            "output_tokens": 144,
+            "input_token_details": {
+                "cached_tokens": 0,
+                "text_tokens": 119,
+                "audio_tokens": 26
+            },
+            "output_token_details": {
+                "text_tokens": 35,
+                "audio_tokens": 109
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "type": "response.output_item.done",
+    "event_id": "event_AIK0yyh5KM5DAlplNwHSw",
+    "response_id": "resp_AIK0waE29Je5nvE0Lp7XJ",
+    "output_index": 0,
+    "item": {
+        "id": "item_AIK0wRecrZqZlLV2oUVja",
+        "object": "realtime.item",
+        "type": "message",
+        "status": "completed",
+        "role": "assistant",
+        "content": [
+            {
+                "type": "audio",
+                "transcript": "I can help with that. Could you please provide the order number or any details related to your order?"
+            }
+        ]
+    }
+}
